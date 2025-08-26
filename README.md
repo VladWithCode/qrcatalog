@@ -1,6 +1,6 @@
 # QR Online Catalog
 
-Online webapp made to showcase the products of the QR Estrellas de la Limpieza Cátalogo, a cleaning company with precense all across México.
+Online webapp made to showcase the products of the QR Estrellas de la Limpieza Cátalogo, a cleaning company with presence all across México.
 
 ## Backend
 
