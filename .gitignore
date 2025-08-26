@@ -1,0 +1,19 @@
+.env*
+.editorconfig
+
+web/style/node_modules
+
+web/static/uploads/*
+!web/static/uploads/.keep
+web/static/qrcodes/*
+!web/static/qrcodes/.keep
+
+dist/
+bin/
+qrcatalog
+
+# ignore tailwindls hack
+tailwind.config.js
+
+sql/data_bk.sql
+sql/eventkinds.sql
