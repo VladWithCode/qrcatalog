@@ -1,8 +1,6 @@
 .env*
 .editorconfig
 
-web/style/node_modules
-
 web/static/uploads/*
 !web/static/uploads/.keep
 web/static/qrcodes/*
@@ -12,8 +10,13 @@ dist/
 bin/
 qrcatalog
 
-# ignore tailwindls hack
-tailwind.config.js
-
 sql/data_bk.sql
 sql/eventkinds.sql
+
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+.nitro
+.tanstack
