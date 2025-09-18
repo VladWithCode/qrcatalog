@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/vladwithcode/qrcatalog/internal/auth"
 	"github.com/vladwithcode/qrcatalog/internal/db"
 	"github.com/vladwithcode/qrcatalog/internal/routes"
 )
@@ -27,6 +28,8 @@ func main() {
 		log.Fatalf("failed to connect to DB:\n%v\n", err)
 	}
 	defer dbPool.Close()
+
+	auth.SetAuthParameters()
 
 	router := routes.NewRouter()
 	fmt.Printf("Starting server on port http://localhost:%s\n", port)
