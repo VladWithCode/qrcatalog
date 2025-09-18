@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/vladwithcode/qrcatalog/internal"
+	"github.com/vladwithcode/qrcatalog/internal/utils"
 )
 
 type Subcategory struct {
@@ -52,7 +52,7 @@ func CreateSubcategory(subcategory *Subcategory) error {
 	}
 
 	if subcategory.Slug == "" {
-		subcategory.Slug = internal.Slugify(subcategory.Name)
+		subcategory.Slug = utils.Slugify(subcategory.Name)
 	}
 
 	args := pgx.NamedArgs{
@@ -394,7 +394,7 @@ func UpdateSubcategory(subcategory *Subcategory) error {
 	}
 
 	if subcategory.Slug == "" {
-		subcategory.Slug = internal.Slugify(subcategory.Name)
+		subcategory.Slug = utils.Slugify(subcategory.Name)
 	}
 
 	args := pgx.NamedArgs{

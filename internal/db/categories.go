@@ -10,7 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/vladwithcode/qrcatalog/internal"
+	"github.com/vladwithcode/qrcatalog/internal/utils"
 )
 
 type Category struct {
@@ -79,7 +79,7 @@ func CreateCategory(category *Category) error {
 	}
 
 	if category.Slug == "" {
-		category.Slug = internal.Slugify(category.Name)
+		category.Slug = utils.Slugify(category.Name)
 	}
 
 	args := pgx.NamedArgs{
@@ -327,7 +327,7 @@ func UpdateCategory(category *Category) error {
 	}
 
 	if category.Slug == "" {
-		category.Slug = internal.Slugify(category.Name)
+		category.Slug = utils.Slugify(category.Name)
 	}
 	args := pgx.NamedArgs{
 		"id":              category.ID,

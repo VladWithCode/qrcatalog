@@ -1,5 +1,5 @@
-// Package internal contains utility functions for the application
-package internal
+// Package utils contains utility functions for the application
+package utils
 
 import (
 	"crypto/rand"

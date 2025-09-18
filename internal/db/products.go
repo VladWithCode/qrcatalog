@@ -13,7 +13,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/vladwithcode/qrcatalog/internal"
+	"github.com/vladwithcode/qrcatalog/internal/utils"
 )
 
 var (
@@ -821,7 +821,7 @@ func SCreateProducts(product []*Product) error {
 		prod.Gallery = []string{prod.MainImg}
 
 		if prod.Slug == "" {
-			prod.Slug = internal.Slugify(prod.Name)
+			prod.Slug = utils.Slugify(prod.Name)
 		}
 
 		args := pgx.NamedArgs{
