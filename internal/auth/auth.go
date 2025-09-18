@@ -79,8 +79,6 @@ func (a *Auth) HasAccess(reqLv AccessLevel) bool {
 	return roleLv >= reqLv
 }
 
-type AuthedHandler func(w http.ResponseWriter, r *http.Request, auth *Auth)
-
 type AuthClaims struct {
 	ID       string
 	Username string
@@ -136,30 +134,28 @@ func ParseToken(tokenStr string) (*jwt.Token, error) {
 	return t, nil
 }
 
-func PopulateAuth(next AuthedHandler) http.HandlerFunc {
+func PopulateAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		next = safeNext(next)
 		cookieToken, err := r.Cookie(DefaultCookieName)
 		var auth = &Auth{}
 		authedReq := r.WithContext(context.WithValue(r.Context(), DefaultAuthCtxKey, auth))
-		defer next(w, authedReq, auth)
+		defer next(w, r)
+
 		if err != nil {
-			auth.ID = InvalidTokenID
 			return
 		}
 
 		tokenStr := strings.Split(cookieToken.String(), "=")
 		if len(tokenStr) < 2 {
-			auth.ID = InvalidTokenID
 			return
 		}
 
 		t, err := ParseToken(tokenStr[1])
 		if err != nil {
 			if errors.Is(err, jwt.ErrTokenExpired) {
-				auth.ID = ExpiredTokenID
 				return
 			}
-			auth.ID = InvalidTokenID
 			return
 		}
 
@@ -181,10 +177,12 @@ func PopulateAuth(next AuthedHandler) http.HandlerFunc {
 			auth.Username = username
 			auth.Fullname = fullname
 		}
+
+		next(w, authedReq)
 	}
 }
 
-func ValidateAuth(next AuthedHandler) http.HandlerFunc {
+func ValidateAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookieToken, err := r.Cookie(DefaultCookieName)
 		if err != nil {
@@ -224,12 +222,7 @@ func ValidateAuth(next AuthedHandler) http.HandlerFunc {
 			}
 
 			authedReq := r.WithContext(context.WithValue(r.Context(), DefaultAuthCtxKey, a))
-			next(w, authedReq, &Auth{
-				ID:       id,
-				Username: username,
-				Role:     role,
-				Fullname: fullname,
-			})
+			next(w, authedReq)
 		} else {
 			RejectUnauthenticated(w, r, "Sesion Token invalido")
 		}
@@ -258,4 +251,15 @@ func ExtractAuthFromCtx(ctx context.Context) (*Auth, error) {
 	}
 
 	return auth, nil
+}
+
+// safeNext ensures that the next handler is only called once
+func safeNext(next http.HandlerFunc) http.HandlerFunc {
+	wasCalled := false
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !wasCalled {
+			next(w, r)
+			wasCalled = true
+		}
+	}
 }
