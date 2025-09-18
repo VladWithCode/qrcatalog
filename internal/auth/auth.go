@@ -3,8 +3,10 @@ package auth
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -12,7 +14,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/vladwithcode/qrcatalog/internal"
 	"github.com/vladwithcode/qrcatalog/internal/db"
 )
 
@@ -28,6 +29,10 @@ var (
 	// DefaultCookieMaxAge is the max age of the cookie in seconds
 	DefaultCookieMaxAge = 60 * 60 * 24 * 7 // 1 week
 )
+
+const DefaultExpirationTime = time.Hour * 24
+const InvalidTokenID = "invalid"
+const ExpiredTokenID = "expired"
 
 func SetAuthParameters() {
 	UseSecureCookies = os.Getenv("USE_SECURE_COOKIES") == "true"
@@ -85,10 +90,6 @@ type AuthClaims struct {
 	jwt.RegisteredClaims
 }
 
-const DefaultExpirationTime = time.Hour * 24
-const InvalidTokenID = "invalid"
-const ExpiredTokenID = "expired"
-
 type AuthCtxKey string
 
 const DefaultAuthCtxKey AuthCtxKey = "auth"
@@ -137,7 +138,7 @@ func ParseToken(tokenStr string) (*jwt.Token, error) {
 
 func PopulateAuth(next AuthedHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cookieToken, err := r.Cookie("auth_token")
+		cookieToken, err := r.Cookie(DefaultCookieName)
 		var auth = &Auth{}
 		authedReq := r.WithContext(context.WithValue(r.Context(), DefaultAuthCtxKey, auth))
 		defer next(w, authedReq, auth)
@@ -185,22 +186,21 @@ func PopulateAuth(next AuthedHandler) http.HandlerFunc {
 
 func ValidateAuth(next AuthedHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cookieToken, err := r.Cookie("auth_token")
+		cookieToken, err := r.Cookie(DefaultCookieName)
 		if err != nil {
-			RejectUnauthenticated(w, r, "No se encontro token")
+			RejectUnauthenticated(w, r, "No se encontró token de sesión")
 			return
 		}
 
 		tokenStr := strings.Split(cookieToken.String(), "=")
 		if len(tokenStr) < 2 {
-			RejectUnauthenticated(w, r, "Token invalido")
+			RejectUnauthenticated(w, r, "Token de sesión inválido")
 			return
 		}
 
 		t, err := ParseToken(tokenStr[1])
 		if err != nil {
-			fmt.Printf("ParseToken err: %v\n", err)
-			RejectUnauthenticated(w, r, "Sesion Token invalido")
+			RejectUnauthenticated(w, r, "Token de sesión inválido")
 			return
 		}
 
@@ -237,16 +237,18 @@ func ValidateAuth(next AuthedHandler) http.HandlerFunc {
 }
 
 func RejectUnauthenticated(w http.ResponseWriter, r *http.Request, reason string) {
-	internal.HandleRedirect("/iniciar-sesion", http.StatusFound, w, r)
+	resData := map[string]string{
+		"error": reason,
+	}
+	w.WriteHeader(http.StatusUnauthorized)
+	err := json.NewEncoder(w).Encode(resData)
+	if err != nil {
+		log.Printf("failed to write error response: %v\n", err)
+	}
 }
 
 func ExtractAuthFromReq(r *http.Request) (*Auth, error) {
-	auth, ok := r.Context().Value(DefaultAuthCtxKey).(*Auth)
-	if !ok || auth == nil {
-		return nil, ErrInvalidAuth
-	}
-
-	return auth, nil
+	return ExtractAuthFromCtx(r.Context())
 }
 
 func ExtractAuthFromCtx(ctx context.Context) (*Auth, error) {
