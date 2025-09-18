@@ -30,8 +30,8 @@ SELECT
 FROM quotes q
 LEFT JOIN cart_items ci ON q.cart_id = ci.cart_id
 LEFT JOIN products p ON ci.product_id = p.id
-LEFT JOIN categories ctg ON p.category = ctg.id
-LEFT JOIN images i ON p.main_img = i.id
+LEFT JOIN categories ctg ON p.category_id = ctg.id
+LEFT JOIN images i ON p.main_img_id = i.id
 GROUP BY 
     q.id, q.customer_name, q.customer_phone, 
     q.cart_id, q.request_type, q.status, 

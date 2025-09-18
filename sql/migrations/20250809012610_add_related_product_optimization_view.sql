@@ -10,7 +10,7 @@ WITH product_terms AS (
     -- Extract the most important terms from each product for comparison
     SELECT 
         p.id,
-        p.category,
+        p.category_id,
         p.name,
         p.description,
         -- Combine searchable text for trigram similarity
@@ -24,7 +24,7 @@ SELECT
     -- Calculate similarity score using multiple strategies
     (
         -- 1. Same category gets the highest weight (0.4)
-        CASE WHEN p1.category = p2.category THEN 0.4 ELSE 0 END +
+        CASE WHEN p1.category_id = p2.category_id THEN 0.4 ELSE 0 END +
         
         -- 2. Text similarity using trigram similarity (0.4 weight)
         -- This compares the overall text content between products
@@ -72,7 +72,7 @@ SELECT
     -- Simple scoring based on category and searchable terms
     (
         -- Same category
-        CASE WHEN p1.category = p2.category THEN 0.6 ELSE 0 END +
+        CASE WHEN p1.category_id = p2.category_id THEN 0.6 ELSE 0 END +
         
         -- Check for common words in names (simple approach)
         CASE 
@@ -91,7 +91,7 @@ FROM products p1
 CROSS JOIN products p2
 WHERE p1.id != p2.id
     AND p2.available = true
-    AND p1.category = p2.category;  -- Only compare within categories for performance
+    AND p1.category_id = p2.category_id;  -- Only compare within categories for performance
 
 -- +goose StatementEnd
 

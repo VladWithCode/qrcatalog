@@ -8,7 +8,7 @@ SELECT
     c.name,
     COUNT(p.id) as product_count
 FROM public.categories c
-LEFT JOIN public.products p ON c.id = p.category
+LEFT JOIN public.products p ON c.id = p.category_id
 GROUP BY c.id, c.name
 ORDER BY c.name;
 
@@ -20,9 +20,11 @@ SELECT
     p.description,
     p.long_description,
     p.slug,
-    p.category as category_id,
+    p.category_id,
     c.name as category_name,
     COALESCE(main_img.filename, '') as image_url,
+    p.price,
+    p.unit,
     p.available,
     p.quantity,
     p.search_vector,
@@ -37,11 +39,10 @@ SELECT
         '[]'::json
     ) as images
 FROM public.products p
-LEFT JOIN public.categories c ON p.category = c.id
-LEFT JOIN public.images main_img ON p.main_img = main_img.id
+LEFT JOIN public.categories c ON p.category_id = c.id
+LEFT JOIN public.images main_img ON p.main_img_id = main_img.id
 ORDER BY p.name;
 
-CREATE INDEX idx_products_category ON public.products(category);
 CREATE INDEX idx_images_products_product_id ON public.images_products(product_id);
 -- +goose StatementEnd
 

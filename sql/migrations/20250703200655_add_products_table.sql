@@ -6,7 +6,8 @@ CREATE TABLE products (
     slug VARCHAR(200) UNIQUE NOT NULL,
     description VARCHAR(360) NOT NULL,
     long_description VARCHAR(512),
-    price NUMERIC(10, 2) NOT NULL DEFAULT 0,
+    price NUMERIC(10, 2) DEFAULT 0,
+    unit VARCHAR(10) DEFAULT 'pc', -- pc, Kg, L, etc
     quantity INTEGER NOT NULL DEFAULT 1,
     category_id UUID REFERENCES categories(id) ON DELETE RESTRICT,
     subcategory_id UUID REFERENCES subcategories(id) ON DELETE RESTRICT,
