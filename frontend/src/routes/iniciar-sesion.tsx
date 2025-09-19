@@ -24,6 +24,7 @@ import { z } from "zod";
 import { PageWrapper } from "@/components/pageWrapper";
 import { checkAuthOptions, signInOptions } from "@/auth";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
 export const Route = createFileRoute("/iniciar-sesion")({
     component: RouteComponent,
@@ -42,7 +43,7 @@ const formSchema = z.object({
     username: z.string().min(2, {
         message: "El nombre de usuario debe tener al menos 2 caracteres",
     }),
-    password: z.string().min(8, {
+    password: z.string().min(4, {
         message: "La contraseña debe tener al menos 8 caracteres",
     }),
 });
@@ -50,6 +51,7 @@ const formSchema = z.object({
 type LoginFormData = z.infer<typeof formSchema>;
 
 function RouteComponent() {
+    const [submitError, setSubmitError] = useState<string | null>(null);
     const form = useForm<LoginFormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -60,13 +62,8 @@ function RouteComponent() {
     const signInMut = useMutation(signInOptions);
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         const response = await signInMut.mutateAsync(data);
-        if (response.isError) {
-            console.error("Error al autenticar usuario:", response.error);
-            return;
-        }
-
-        if (response.data.redirect) {
-            window.location.href = response.data.redirect;
+        if (!response?.isAuthenticated) {
+            setSubmitError(response?.message || "Usuario o contraseña incorrectos");
         }
     };
 
@@ -115,6 +112,11 @@ function RouteComponent() {
                                         </FormItem>
                                     )}
                                 />
+                                {submitError && (
+                                    <FormMessage className="text-xs">
+                                        {submitError}
+                                    </FormMessage>
+                                )}
                                 <Button type="submit" className="bg-primary-dark">
                                     Iniciar Sesión
                                 </Button>

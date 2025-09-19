@@ -52,17 +52,20 @@ export const signIn = async (data: TSignInData) => {
             mode: "cors",
             body: JSON.stringify(data),
         });
+        const authResult = await response.json();
+
+        if (!response.ok) {
+            return {
+                ...authResult,
+                isAuthenticated: false,
+            };
+        }
+
+        return authResult;
     } catch (error) {
         console.error("Error al autenticar usuario:", error);
         throw new Error("Error al autenticar usuario");
     }
-    console.log("response", response);
-
-    if (!response.ok) {
-        return null;
-    }
-
-    return response.json() as Promise<TSignInResponse>;
 };
 
 export const signInOptions = mutationOptions({
