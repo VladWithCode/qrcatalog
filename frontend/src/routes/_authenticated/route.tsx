@@ -1,11 +1,20 @@
+import { checkAuthOptions } from '@/auth'
 import { Header } from '@/components/dashboard/header'
 import { DashboardSidebar } from '@/components/dashboard/sidebar'
 import { PageWrapper } from '@/components/pageWrapper'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated')({
     component: RouteComponent,
+    beforeLoad: async ({ context }) => {
+        const authData = await context.queryClient.fetchQuery(checkAuthOptions);
+        if (!authData || !authData.isAuthenticated) {
+            throw redirect({ to: '/iniciar-sesion' });
+        }
+
+        return { authData }
+    },
 })
 
 function RouteComponent() {

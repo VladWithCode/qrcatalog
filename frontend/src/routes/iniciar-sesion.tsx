@@ -17,16 +17,24 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { PageWrapper } from "@/components/pageWrapper";
+import { checkAuthOptions, signInOptions } from "@/auth";
+import { useMutation } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/iniciar-sesion")({
     component: RouteComponent,
     staticData: {
         withOpaqueHeader: true,
+    },
+    beforeLoad: async ({ context }) => {
+        const authData = await context.queryClient.fetchQuery(checkAuthOptions);
+        if (authData && authData.isAuthenticated) {
+            throw redirect({ to: '/dashboard' });
+        }
     },
 });
 
@@ -49,8 +57,17 @@ function RouteComponent() {
             password: "",
         },
     });
+    const signInMut = useMutation(signInOptions);
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        console.log(data);
+        const response = await signInMut.mutateAsync(data);
+        if (response.isError) {
+            console.error("Error al autenticar usuario:", response.error);
+            return;
+        }
+
+        if (response.data.redirect) {
+            window.location.href = response.data.redirect;
+        }
     };
 
     return (
