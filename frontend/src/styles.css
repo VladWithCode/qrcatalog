@@ -1,31 +1,28 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@theme {
-    --font-sans: "Montserrat", sans-serif;
-    --font-serif: "Libertinus Math", serif;
+@font-face {
+    font-family: "Montserrat";
+    src: url("/fonts/Montserrat-VariableFont_wght.ttf") format("truetype-variations");
+    font-weight: 100 900;
+    font-display: swap;
+    font-style: normal;
+}
 
-    /* Primary colors (greens) */
-    --color-primary-dark: #1bac90;
-    --color-primary: #67c18c;
-    --color-primary-light: #79c58c;
+@font-face {
+    font-family: "Montserrat";
+    src: url("/fonts/Montserrat-Italic-VariableFont_wght.ttf") format("truetype-variations");
+    font-weight: 100 900;
+    font-display: swap;
+    font-style: italic;
+}
 
-    --color-wsp: #25d366;
-
-    /* Secondary colors (blues) */
-    --color-secondary-dark: #14618a;
-    --color-secondary: #1e92d2;
-    --color-secondary-light: #0da1db;
-
-    /* Accent colors (pinks and orange) */
-    --color-accent: #f05988;
-    --color-accent-light: #f16780;
-    --color-warning: #f48665;
-
-    --c-bg-header-opaque: --alpha(var(--color-gray-50) / 100%);
-    --c-bg-header-translucent: --alpha(var(--color-gray-50) / 0%);
-
-    --breakpoint-xs: 420px;
+@font-face {
+    font-family: "Libertinus Math";
+    src: url("/fonts/LibertinusMath-Regular") format("truetype");
+    font-weight: 400;
+    font-display: swap;
+    font-style: normal;
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -151,26 +148,30 @@
     }
 }
 
-@font-face {
-    font-family: "Montserrat";
-    src: url("/fonts/Montserrat-VariableFont_wght.ttf") format("truetype-variations");
-    font-weight: 100 900;
-    font-display: swap;
-    font-style: normal;
+@theme {
+    --font-sans: "Montserrat", sans-serif;
+    --font-serif: "Libertinus Math", serif;
+
+    /* Primary colors (greens) */
+    --color-primary-dark: #1bac90;
+    --color-primary: #67c18c;
+    --color-primary-light: #79c58c;
+
+    --color-wsp: #25d366;
+
+    /* Secondary colors (blues) */
+    --color-secondary-dark: #14618a;
+    --color-secondary: #1e92d2;
+    --color-secondary-light: #0da1db;
+
+    /* Accent colors (pinks and orange) */
+    --color-accent: #f05988;
+    --color-accent-light: #f16780;
+    --color-warning: #f48665;
+
+    --c-bg-header-opaque: --alpha(var(--color-gray-50) / 100%);
+    --c-bg-header-translucent: --alpha(var(--color-gray-50) / 0%);
+
+    --breakpoint-xs: 420px;
 }
 
-@font-face {
-    font-family: "Montserrat";
-    src: url("/fonts/Montserrat-Italic-VariableFont_wght.ttf") format("truetype-variations");
-    font-weight: 100 900;
-    font-display: swap;
-    font-style: italic;
-}
-
-@font-face {
-    font-family: "Libertinus Math";
-    src: url("/fonts/LibertinusMath-Regular") format("truetype");
-    font-weight: 400;
-    font-display: swap;
-    font-style: normal;
-}
