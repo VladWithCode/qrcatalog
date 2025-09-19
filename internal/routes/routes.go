@@ -32,25 +32,30 @@ func NewRouter() http.Handler {
 }
 
 func CheckAuth(w http.ResponseWriter, r *http.Request) {
-	resData := map[string]any{
-		"isAuthenticated": false,
-		"message":         "No se encontró token de sesión",
-	}
 	a, err := auth.ExtractAuthFromReq(r)
 	if err != nil {
+		resData := map[string]any{
+			"isAuthenticated": false,
+			"message":         "No se encontró token de sesión",
+		}
 		respondWithJSON(w, r, http.StatusUnauthorized, resData)
 		return
 	}
 
 	if a.ID != "" && a.ID != auth.InvalidTokenID && a.ID != auth.ExpiredTokenID {
-		resData["isAuthenticated"] = true
-		resData["user"] = a.ID
-		resData["message"] = "Usuario autenticado"
+		resData := map[string]any{
+			"isAuthenticated": true,
+			"user":            a.ID,
+			"message":         "Usuario autenticado",
+		}
 		respondWithJSON(w, r, http.StatusOK, resData)
 		return
 	}
 
-	resData["message"] = "Usuario no autenticado"
+	resData := map[string]any{
+		"isAuthenticated": false,
+		"message":         "Usuario no autenticado",
+	}
 	respondWithJSON(w, r, http.StatusUnauthorized, resData)
 }
 
@@ -106,7 +111,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		"redirect":        "/panel",
 		"message":         "Usuario autenticado con éxito",
 		"isAuthenticated": true,
-		"user":            a.ID,
+		"user":            user.ID,
 	})
 }
 
@@ -134,13 +139,18 @@ func respondWithNotFound(w http.ResponseWriter, r *http.Request) {
 func respondWithJSON(w http.ResponseWriter, r *http.Request, code int, data any) {
 	w.Header().Set("Connection", "close")
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
 
-	err := json.NewEncoder(w).Encode(data)
+	// Encode to buffer first to catch errors before writing headers
+	jsonData, err := json.Marshal(data)
 	if err != nil {
-		log.Printf("[%s] %s failed: %v\n", r.Method, r.URL.Path, err)
-		w.Write([]byte("{\"error\": \"Internal server error\"}"))
+		log.Printf("[%s] %s JSON marshal failed: %v\n", r.Method, r.URL.Path, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error": "Internal server error"}`))
+		return
 	}
+
+	w.WriteHeader(code)
+	w.Write(jsonData)
 }
 
 func respondWithError(w http.ResponseWriter, r *http.Request, code int, reason string, err error) {

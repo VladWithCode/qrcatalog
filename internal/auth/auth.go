@@ -138,7 +138,6 @@ func PopulateAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookieToken, err := r.Cookie(DefaultCookieName)
 		var auth = &Auth{}
-		authedReq := r.WithContext(context.WithValue(r.Context(), DefaultAuthCtxKey, auth))
 		defer next(w, r)
 
 		if err != nil {
@@ -177,6 +176,7 @@ func PopulateAuth(next http.HandlerFunc) http.HandlerFunc {
 			auth.Fullname = fullname
 		}
 
+		authedReq := r.WithContext(context.WithValue(r.Context(), DefaultAuthCtxKey, auth))
 		next(w, authedReq)
 	}
 }
