@@ -28,22 +28,19 @@ func main() {
 	}
 	defer conn.Close()
 
-	id, err := uuid.NewV7()
-	if err != nil {
-		log.Fatalf("failed to generate uuid: %v", err)
-	}
+	id := uuid.Must(uuid.NewV7()).String()
 	defaultUser := db.User{
-		ID:       id.String(),
+		ID:       id,
 		Fullname: "Administrador",
 		Username: user,
 		Password: pass,
 		Role:     db.RoleAdmin,
-		Email:    "admin@chenacolo.com",
+		Email:    "admin@qrestrellas.com",
 	}
 	_, err = db.CreateUser(&defaultUser)
 	if err != nil {
 		log.Fatalf("failed to create user: %v", err)
 	}
 
-	log.Printf("User created with id: %v", id.String())
+	log.Printf("User created with id: %v", id)
 }
