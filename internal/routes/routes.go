@@ -16,16 +16,6 @@ import (
 func NewRouter() http.Handler {
 	router := NewCustomServeMux()
 
-	RegisterDashboardRoutes(router)
-	RegisterImagesRoutes(router)
-	RegisterImageSelectorRoutes(router)
-	RegisterCategoriesRoutes(router)
-	RegisterProductsRoutes(router)
-	RegisterEventKindsRoutes(router)
-	RegisterContactRequestsRoutes(router)
-	RegisterCatalogRoutes(router)
-	RegisterCartRoutes(router)
-	RegisterUserRoutes(router)
 	RegisterSectionsRoutes(router)
 
 	// Api
