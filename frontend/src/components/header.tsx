@@ -15,7 +15,7 @@ import { useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useInView } from "react-intersection-observer";
 
-export function Header() {
+export function Header({ className, noAnimate, alwaysOpaque }: { noAnimate?: boolean, alwaysOpaque?: boolean } & React.HTMLAttributes<HTMLDivElement>) {
     const { inView, ref: headerThreshold } = useInView();
     const container = useRef<HTMLDivElement>(null);
     const isMobile = useIsMobile();
@@ -23,25 +23,38 @@ export function Header() {
 
     const { contextSafe } = useGSAP({ scope: container });
     const animateHeader = contextSafe((inView: boolean, isMenuOpen: boolean) => {
+        if (noAnimate) {
+            return;
+        }
+
+        const conditionalProps: gsap.TweenVars = {}
         if (inView && !isMenuOpen) {
+            if (!alwaysOpaque) {
+                conditionalProps.backgroundColor = "var(--c-bg-header-translucent)";
+                conditionalProps.color = "var(--color-gray-50)";
+            }
+
             gsap.to("header", {
                 y: "0rem",
                 opacity: 1,
-                backgroundColor: "var(--c-bg-header-translucent)",
-                color: "var(--color-gray-50)",
                 position: "absolute",
                 ease: "power1.in",
                 duration: 0.3,
+                ...conditionalProps,
             });
         } else {
+            if (!alwaysOpaque) {
+                conditionalProps.backgroundColor = "var(--c-bg-header-opaque)";
+                conditionalProps.color = "var(--color-gray-800)";
+            }
+
             gsap.to("header", {
                 y: "0rem",
                 opacity: 1,
-                backgroundColor: "var(--c-bg-header-opaque)",
-                color: "var(--color-gray-800)",
                 position: "fixed",
                 ease: "power1.in",
                 duration: 0.3,
+                ...conditionalProps,
             });
         }
     });
@@ -53,21 +66,38 @@ export function Header() {
     return (
         <div className="relative z-30 w-screen" ref={container}>
             <header
-                className="absolute top-0 inset-x-0 h-14 text-stone-50 flex items-center z-20 px-2 md:px-12"
+                className={cn(
+                    "absolute top-0 inset-x-0 h-14 text-stone-50 flex items-center z-20 px-2 md:px-12",
+                    className,
+                    noAnimate && "fixed",
+                    alwaysOpaque && "bg-gray-50 text-stone-800 shadow",
+                )}
                 data-state={isMenuOpen ? "open" : "closed"}
             >
                 <a
-                    className="text-stone-50 -translate-y-9 opacity-0 h-10"
+                    className={cn(
+                        "text-stone-50 -translate-y-9 opacity-0 h-10",
+                        noAnimate && "translate-y-0 opacity-100",
+                    )}
+                    data-no-animate={noAnimate}
+                    data-always-opaque={alwaysOpaque}
                     data-view-animate="fadeIn"
                 >
                     <img src="/logo_1.webp" alt="logo" className="h-full md:h-16" />
                 </a>
                 <Button
                     id="menu-toggler"
-                    className="relative ml-auto h-9 w-9 flex flex-col justify-center items-center rounded-full gap-1 bg-stone-50/0 hover:bg-stone-50/100 hover:text-stone-800 active:bg-stone-50/100 active:text-stone-800 hover:cursor-pointer hover:gap-0.5 active:gap-0 transition-[background,color,gap] -translate-y-9 opacity-0 data-[sticking=true]:text-stone-700"
+                    className={cn(
+                        "relative ml-auto h-9 w-9 flex flex-col gap-1 opacity-0 data-[sticking=true]:text-gray-800",
+                        noAnimate && "translate-y-0 opacity-100",
+                        alwaysOpaque && "text-stone-800",
+                    )}
                     data-sticking={!inView || isMenuOpen ? "true" : "false"}
                     data-view-animate="fadeIn"
+                    data-no-animate={noAnimate}
+                    data-always-opaque={alwaysOpaque}
                     onClick={() => setIsMenuOpen((isOpen) => !isOpen)}
+                    variant="ghost"
                 >
                     <div className="w-5 h-0.5 bg-current" data-toggler-line="1"></div>
                     <div className="w-5 h-0.5 bg-current" data-toggler-line="2"></div>
