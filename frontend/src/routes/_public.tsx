@@ -5,6 +5,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Footer } from "@/components/footer";
 import { FloatingWhatsappBtn } from "@/components/wsp";
+import { PageWrapper } from "@/components/pageWrapper";
 
 export const Route = createFileRoute("/_public")({
     component: RouteComponent,
@@ -45,14 +46,11 @@ function RouteComponent() {
     }, []);
 
     return (
-        <div
-            className="relative h-screen w-screen grid grid-rows-[auto_1fr_auto] z-0 overflow-x-hidden scroll-smooth"
-            ref={container}
-        >
+        <PageWrapper ref={container}>
             <Header />
             <Outlet />
             <Footer />
             <FloatingWhatsappBtn />
-        </div>
+        </PageWrapper>
     );
 }
