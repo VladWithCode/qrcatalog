@@ -1,8 +1,21 @@
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { createFileRoute } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
@@ -38,7 +51,7 @@ function RouteComponent() {
     });
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         console.log(data);
-    }
+    };
 
     return (
         <PageWrapper>
@@ -55,7 +68,10 @@ function RouteComponent() {
                     </CardHeader>
                     <CardContent>
                         <Form {...form}>
-                            <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+                            <form
+                                className="flex flex-col gap-4"
+                                onSubmit={form.handleSubmit(onSubmit)}
+                            >
                                 <FormField
                                     control={form.control}
                                     name="username"
@@ -82,7 +98,9 @@ function RouteComponent() {
                                         </FormItem>
                                     )}
                                 />
-                                <Button type="submit" className="bg-primary-dark">Iniciar Sesión</Button>
+                                <Button type="submit" className="bg-primary-dark">
+                                    Iniciar Sesión
+                                </Button>
                             </form>
                         </Form>
                     </CardContent>
