@@ -58,7 +58,12 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	a, err := auth.ExtractAuthFromReq(r)
 	if err == nil {
 		if a.ID != "" && a.ID != auth.InvalidTokenID && a.ID != auth.ExpiredTokenID {
-			respondWithJSON(w, r, http.StatusFound, map[string]any{"redirect": "/panel"})
+			respondWithJSON(w, r, http.StatusFound, map[string]any{
+				"redirect":        "/panel",
+				"message":         "Usuario ya ha sido autenticado",
+				"isAuthenticated": true,
+				"user":            a.ID,
+			})
 			return
 		}
 	}
@@ -97,7 +102,12 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		Secure:   auth.UseSecureCookies,
 	})
 
-	respondWithJSON(w, r, http.StatusFound, map[string]any{"redirect": "/panel"})
+	respondWithJSON(w, r, http.StatusFound, map[string]any{
+		"redirect":        "/panel",
+		"message":         "Usuario autenticado con éxito",
+		"isAuthenticated": true,
+		"user":            a.ID,
+	})
 }
 
 func SignOut(w http.ResponseWriter, r *http.Request) {
