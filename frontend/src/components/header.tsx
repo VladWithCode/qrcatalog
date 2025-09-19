@@ -18,13 +18,13 @@ import { useInView } from "react-intersection-observer";
 export function Header() {
     const { inView, ref: headerThreshold } = useInView();
     const container = useRef<HTMLDivElement>(null);
-    const isMobile = useIsMobile()
+    const isMobile = useIsMobile();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const { contextSafe } = useGSAP({ scope: container })
+    const { contextSafe } = useGSAP({ scope: container });
     const animateHeader = contextSafe((inView: boolean, isMenuOpen: boolean) => {
         if (inView && !isMenuOpen) {
-            gsap.to('header', {
+            gsap.to("header", {
                 y: "0rem",
                 opacity: 1,
                 backgroundColor: "var(--c-bg-header-translucent)",
@@ -32,9 +32,9 @@ export function Header() {
                 position: "absolute",
                 ease: "power1.in",
                 duration: 0.3,
-            })
+            });
         } else {
-            gsap.to('header', {
+            gsap.to("header", {
                 y: "0rem",
                 opacity: 1,
                 backgroundColor: "var(--c-bg-header-opaque)",
@@ -75,9 +75,7 @@ export function Header() {
                 </Button>
             </header>
             <div className="absolute top-[65vh] inset-x-0" ref={headerThreshold}></div>
-            {isMobile
-                ? <MobileNavigationMenu isOpen={isMenuOpen} />
-                : <HeaderNavigationMenu />}
+            {isMobile ? <MobileNavigationMenu isOpen={isMenuOpen} /> : <HeaderNavigationMenu />}
         </div>
     );
 }
@@ -98,22 +96,32 @@ export function HeaderNavigationMenu() {
 }
 
 function MobileNavigationMenu({ isOpen }: { isOpen: boolean }) {
-    const location = useLocation()
+    const location = useLocation();
     const [activeSection, setActiveSection] = useState<string | null>(null);
     const nav = useRef<HTMLDivElement>(null);
     const tl = useRef<gsap.core.Timeline>(null);
-    const { contextSafe } = useGSAP(() => {
-        tl.current = gsap.timeline({ paused: true, defaults: { duration: 0.3, ease: "power1.in" } });
-        tl.current.to('[data-menu-animate="hor"]', {
-            x: "0rem",
-            opacity: 1,
-            stagger: 0.05,
-        });
-        tl.current.to('[data-menu-animate="ver"]', {
-            y: "0rem",
-            opacity: 1,
-        }, "-=0.1");
-    }, { scope: nav })
+    const { contextSafe } = useGSAP(
+        () => {
+            tl.current = gsap.timeline({
+                paused: true,
+                defaults: { duration: 0.3, ease: "power1.in" },
+            });
+            tl.current.to('[data-menu-animate="hor"]', {
+                x: "0rem",
+                opacity: 1,
+                stagger: 0.05,
+            });
+            tl.current.to(
+                '[data-menu-animate="ver"]',
+                {
+                    y: "0rem",
+                    opacity: 1,
+                },
+                "-=0.1",
+            );
+        },
+        { scope: nav },
+    );
     const animateIn = contextSafe((isOpen: boolean) => {
         if (!tl.current) {
             return;
@@ -132,12 +140,12 @@ function MobileNavigationMenu({ isOpen }: { isOpen: boolean }) {
             return;
         }
 
-        setActiveSection(location.hash)
-    }, [location.hash])
+        setActiveSection(location.hash);
+    }, [location.hash]);
 
     useEffect(() => {
         animateIn(isOpen);
-    }, [isOpen])
+    }, [isOpen]);
 
     return (
         <nav
