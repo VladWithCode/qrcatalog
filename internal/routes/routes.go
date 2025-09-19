@@ -11,7 +11,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/vladwithcode/qrcatalog/internal/auth"
 	"github.com/vladwithcode/qrcatalog/internal/db"
-	"github.com/vladwithcode/qrcatalog/internal/templates/pages"
 )
 
 func NewRouter() http.Handler {
@@ -27,6 +26,7 @@ func NewRouter() http.Handler {
 	RegisterCatalogRoutes(router)
 	RegisterCartRoutes(router)
 	RegisterUserRoutes(router)
+	RegisterSectionsRoutes(router)
 
 	// Api
 	router.HandleFunc("GET /api/auth", auth.PopulateAuth(CheckAuth))
@@ -61,80 +61,36 @@ func CheckAuth(w http.ResponseWriter, r *http.Request) {
 }
 
 func SignIn(w http.ResponseWriter, r *http.Request) {
-	a, _ := auth.ExtractAuthFromReq(r)
-	if a.ID != "" && a.ID != auth.InvalidTokenID && a.ID != auth.ExpiredTokenID {
-		respondWithJSON(w, r, http.StatusFound, map[string]any{"redirect": "/panel"})
-		return
-	}
-
-	signinPage := pages.SignIn
-	err := r.ParseForm()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		err = signinPage(&pages.FormState{
-			ServerError: "Error inesperado",
-		}).Render(r.Context(), w)
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Error inesperado"))
+	a, err := auth.ExtractAuthFromReq(r)
+	if err == nil {
+		if a.ID != "" && a.ID != auth.InvalidTokenID && a.ID != auth.ExpiredTokenID {
+			respondWithJSON(w, r, http.StatusFound, map[string]any{"redirect": "/panel"})
+			return
 		}
+	}
+
+	data := db.User{}
+	err = json.NewDecoder(r.Body).Decode(&data)
+	if data.Username == "" || data.Password == "" {
+		respondWithError(w, r, http.StatusBadRequest, "El nombre de usuario y la contraseña son requeridos", nil)
 		return
 	}
 
-	username := r.FormValue("user")
-	password := r.FormValue("password")
-
-	if username == "" || password == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		err = signinPage(&pages.FormState{
-			UserError:     "El nombre de usuario es requerido",
-			UserValue:     username,
-			PasswordError: "La contraseña es requerida",
-		}).Render(r.Context(), w)
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Error inesperado"))
-		}
-		return
-	}
-
-	user, err := db.GetUserByUsername(username)
+	user, err := db.GetUserByUsername(data.Username)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		signinPage(&pages.FormState{
-			UserError:     "Revisa que el nombre de usuario sea correcto",
-			UserValue:     username,
-			PasswordError: "Revisa que la contraseña sea correcta",
-		}).Render(r.Context(), w)
-		log.Printf("signin failed: %v\n", err)
+		respondWithError(w, r, http.StatusUnauthorized, "El nombre de usuario o contraseña son incorrectos", err)
 		return
 	}
 
-	err = user.ValidatePass(password)
+	err = user.ValidatePass(data.Password)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		err = signinPage(&pages.FormState{
-			UserError:     "Revisa que el nombre de usuario sea correcto",
-			UserValue:     username,
-			PasswordError: "Revisa que la contraseña sea correcta",
-		}).Render(r.Context(), w)
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Error inesperado"))
-		}
+		respondWithError(w, r, http.StatusUnauthorized, "El nombre de usuario o contraseña son incorrectos", err)
 		return
 	}
 
 	token, err := auth.CreateToken(user)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		err = signinPage(&pages.FormState{
-			ServerError: "Error inesperado",
-		}).Render(r.Context(), w)
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Error inesperado"))
-		}
+		respondWithError(w, r, http.StatusInternalServerError, "Ocurrió un error inesperado", err)
 		return
 	}
 
@@ -143,8 +99,8 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		Value:    token,
 		Expires:  time.Now().Add(time.Hour * 24 * 7),
 		Path:     "/",
-		HttpOnly: true,
-		// Secure:   true,
+		HttpOnly: auth.UseHTTPOnlyCookies,
+		Secure:   auth.UseSecureCookies,
 	})
 
 	respondWithJSON(w, r, http.StatusFound, map[string]any{"redirect": "/panel"})
@@ -190,7 +146,7 @@ func respondWithError(w http.ResponseWriter, r *http.Request, code int, reason s
 		"error": reason,
 	}
 	respondWithJSON(w, r, code, resData)
-	log.Printf("request to [%s] failed: %v\n", r.URL.Path, err)
+	log.Printf("[%s] %s failed: %v\n", r.Method, r.URL.Path, err)
 }
 
 func publicMiddleware(next http.HandlerFunc) http.HandlerFunc {
