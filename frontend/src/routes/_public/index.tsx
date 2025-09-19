@@ -7,7 +7,11 @@ export const Route = createFileRoute("/_public/")({
 function Index() {
     return (
         <>
-            <section className="relative h-[95vh] z-0 overflow-hidden" id="inicio" data-section="inicio">
+            <section
+                className="relative h-[95vh] z-0 overflow-hidden"
+                id="inicio"
+                data-section="inicio"
+            >
                 <div className="absolute inset-0 z-0">
                     <video
                         className="h-full max-w-full object-cover brightness-50 md:w-full"
@@ -139,7 +143,11 @@ function Index() {
                 </div>
             </section>
 
-            <section className="relative z-10 text-stone-50 text-end -mt-24" id="airbnb" data-section="airbnb">
+            <section
+                className="relative z-10 text-stone-50 text-end -mt-24"
+                id="airbnb"
+                data-section="airbnb"
+            >
                 <svg
                     className="fill-primary-dark translate-y-px"
                     xmlns="http://www.w3.org/2000/svg"
@@ -314,7 +322,11 @@ function Index() {
                 </div>
             </section>
 
-            <section id="fumigacion" className="relative z-0 py-16 px-4 md:px-12" data-section="fumigacion">
+            <section
+                id="fumigacion"
+                className="relative z-0 py-16 px-4 md:px-12"
+                data-section="fumigacion"
+            >
                 <div className="relative flex flex-col z-10 gap-4 xl:flex-row">
                     <div className="basis-1/2 shrink grow space-y-4 my-auto xl:order-2">
                         <h2
@@ -375,7 +387,11 @@ function Index() {
                 </div>
             </section>
 
-            <section id="lavanderia" className="relative py-16 px-4 z-0" data-section="lavanderia">
+            <section
+                id="lavanderia"
+                className="relative py-16 px-4 z-0"
+                data-section="lavanderia"
+            >
                 <div className="relative text-end flex flex-col z-10 gap-4 xl:flex-row">
                     <div className="basis-1/2 shrink grow space-y-4 my-auto">
                         <h2
@@ -552,7 +568,11 @@ function Index() {
                 </div>
             </section>
 
-            <section id="cobertura" className="relative z-0 space-y-4 py-16 px-4 md:px-12" data-section="cobertura">
+            <section
+                id="cobertura"
+                className="relative z-0 space-y-4 py-16 px-4 md:px-12"
+                data-section="cobertura"
+            >
                 <div className="flex flex-col text-end gap-4">
                     <h2
                         className="text-4xl font-bold opacity-0 translate-y-20"

@@ -4,9 +4,12 @@ export function FloatingWhatsappBtn() {
     const [query, setQuery] = useState("");
     useEffect(() => {
         let usp = new URLSearchParams();
-        usp.set("text", "¡Hola!, me encantaría saber más sobre los servicios de QR Estrellas de la Limpieza.");
+        usp.set(
+            "text",
+            "¡Hola!, me encantaría saber más sobre los servicios de QR Estrellas de la Limpieza.",
+        );
         setQuery(usp.toString());
-    }, [])
+    }, []);
 
     return (
         <div id="wsp-float" className="fixed bottom-4 right-4 z-40">

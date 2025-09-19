@@ -15,7 +15,11 @@ import { useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useInView } from "react-intersection-observer";
 
-export function Header({ className, noAnimate, alwaysOpaque }: { noAnimate?: boolean, alwaysOpaque?: boolean } & React.HTMLAttributes<HTMLDivElement>) {
+export function Header({
+    className,
+    noAnimate,
+    alwaysOpaque,
+}: { noAnimate?: boolean; alwaysOpaque?: boolean } & React.HTMLAttributes<HTMLDivElement>) {
     const { inView, ref: headerThreshold } = useInView();
     const container = useRef<HTMLDivElement>(null);
     const isMobile = useIsMobile();
@@ -27,7 +31,7 @@ export function Header({ className, noAnimate, alwaysOpaque }: { noAnimate?: boo
             return;
         }
 
-        const conditionalProps: gsap.TweenVars = {}
+        const conditionalProps: gsap.TweenVars = {};
         if (inView && !isMenuOpen) {
             if (!alwaysOpaque) {
                 conditionalProps.backgroundColor = "var(--c-bg-header-translucent)";
