@@ -45,9 +45,13 @@ func CheckAuth(w http.ResponseWriter, r *http.Request) {
 	if a.ID != "" && a.ID != auth.InvalidTokenID && a.ID != auth.ExpiredTokenID {
 		resData["isAuthenticated"] = true
 		resData["user"] = a.ID
+		resData["message"] = "Usuario autenticado"
 		respondWithJSON(w, r, http.StatusOK, resData)
 		return
 	}
+
+	resData["message"] = "Usuario no autenticado"
+	respondWithJSON(w, r, http.StatusUnauthorized, resData)
 }
 
 func SignIn(w http.ResponseWriter, r *http.Request) {
