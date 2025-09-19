@@ -17,7 +17,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -51,6 +51,7 @@ const formSchema = z.object({
 type LoginFormData = z.infer<typeof formSchema>;
 
 function RouteComponent() {
+    const router = useRouter();
     const [submitError, setSubmitError] = useState<string | null>(null);
     const form = useForm<LoginFormData>({
         resolver: zodResolver(formSchema),
@@ -62,8 +63,15 @@ function RouteComponent() {
     const signInMut = useMutation(signInOptions);
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         const response = await signInMut.mutateAsync(data);
-        if (!response?.isAuthenticated) {
-            setSubmitError(response?.message || "Usuario o contraseña incorrectos");
+        if (!response) {
+            setSubmitError("Ocurrió un error inesperado");
+            return;
+        }
+
+        if (response.isAuthenticated) {
+            router.history.push('/dashboard');
+        } else {
+            setSubmitError(response.error);
         }
     };
 

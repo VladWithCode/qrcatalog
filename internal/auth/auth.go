@@ -137,43 +137,59 @@ func ParseToken(tokenStr string) (*jwt.Token, error) {
 func PopulateAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookieToken, err := r.Cookie(DefaultCookieName)
-		var auth = &Auth{}
-		defer next(w, r)
-
 		if err != nil {
+			// No auth cookie - call next with empty auth
+			auth := &Auth{}
+			authedReq := r.WithContext(context.WithValue(r.Context(), DefaultAuthCtxKey, auth))
+			next(w, authedReq)
 			return
 		}
 
 		tokenStr := strings.Split(cookieToken.String(), "=")
 		if len(tokenStr) < 2 {
+			auth := &Auth{}
+			authedReq := r.WithContext(context.WithValue(r.Context(), DefaultAuthCtxKey, auth))
+			next(w, authedReq)
 			return
 		}
 
 		t, err := ParseToken(tokenStr[1])
 		if err != nil {
+			auth := &Auth{}
 			if errors.Is(err, jwt.ErrTokenExpired) {
-				return
+				auth.ID = ExpiredTokenID
+			} else {
+				auth.ID = InvalidTokenID
 			}
+			authedReq := r.WithContext(context.WithValue(r.Context(), DefaultAuthCtxKey, auth))
+			next(w, authedReq)
 			return
 		}
 
+		auth := &Auth{}
 		if claims, ok := t.Claims.(jwt.MapClaims); ok && t.Valid {
-			var (
-				id, ok1       = claims["ID"].(string)
-				username, ok2 = claims["Username"].(string)
-				role, ok3     = claims["Role"].(string)
-				fullname, ok4 = claims["Fullname"].(string)
-			)
-
-			if !ok1 || !ok2 || !ok3 || !ok4 {
+			if id, ok1 := claims["ID"].(string); ok1 {
+				if username, ok2 := claims["Username"].(string); ok2 {
+					if role, ok3 := claims["Role"].(string); ok3 {
+						if fullname, ok4 := claims["Fullname"].(string); ok4 {
+							auth.ID = id
+							auth.Role = role
+							auth.Username = username
+							auth.Fullname = fullname
+						} else {
+							auth.ID = InvalidTokenID
+						}
+					} else {
+						auth.ID = InvalidTokenID
+					}
+				} else {
+					auth.ID = InvalidTokenID
+				}
+			} else {
 				auth.ID = InvalidTokenID
-				return
 			}
-
-			auth.ID = id
-			auth.Role = role
-			auth.Username = username
-			auth.Fullname = fullname
+		} else {
+			auth.ID = InvalidTokenID
 		}
 
 		authedReq := r.WithContext(context.WithValue(r.Context(), DefaultAuthCtxKey, auth))

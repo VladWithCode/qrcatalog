@@ -107,7 +107,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		Secure:   auth.UseSecureCookies,
 	})
 
-	respondWithJSON(w, r, http.StatusFound, map[string]any{
+	respondWithJSON(w, r, http.StatusCreated, map[string]any{
 		"redirect":        "/panel",
 		"message":         "Usuario autenticado con éxito",
 		"isAuthenticated": true,
