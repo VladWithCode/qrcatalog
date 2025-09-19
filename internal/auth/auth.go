@@ -136,7 +136,6 @@ func ParseToken(tokenStr string) (*jwt.Token, error) {
 
 func PopulateAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		next = safeNext(next)
 		cookieToken, err := r.Cookie(DefaultCookieName)
 		var auth = &Auth{}
 		authedReq := r.WithContext(context.WithValue(r.Context(), DefaultAuthCtxKey, auth))
@@ -251,15 +250,4 @@ func ExtractAuthFromCtx(ctx context.Context) (*Auth, error) {
 	}
 
 	return auth, nil
-}
-
-// safeNext ensures that the next handler is only called once
-func safeNext(next http.HandlerFunc) http.HandlerFunc {
-	wasCalled := false
-	return func(w http.ResponseWriter, r *http.Request) {
-		if !wasCalled {
-			next(w, r)
-			wasCalled = true
-		}
-	}
 }
