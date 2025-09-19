@@ -208,13 +208,13 @@ const mainNavigationItems = [
         icon: HomeIcon,
     },
     {
-        label: "Servicio de Lavanderia",
-        to: "#lavanderia",
+        label: "Servicio de Fumigación",
+        to: "#fumigacion",
         icon: HomeIcon,
     },
     {
-        label: "Servicio de Fumigación",
-        to: "#fumigacion",
+        label: "Servicio de Lavanderia",
+        to: "#lavanderia",
         icon: HomeIcon,
     },
     {
