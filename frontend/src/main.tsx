@@ -8,11 +8,15 @@ import { routeTree } from "./routeTree.gen";
 import "./styles.css";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/all";
+import { queryClient } from "./queries/queryClient";
 
 // Create a new router instance
 const router = createRouter({
     routeTree,
-    context: {},
+    context: {
+        queryClient: queryClient,
+        auth: null,
+    },
     defaultPreload: "intent",
     scrollRestoration: true,
     defaultStructuralSharing: true,
