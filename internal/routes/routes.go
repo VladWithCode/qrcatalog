@@ -118,17 +118,15 @@ func respondWithNotFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func respondWithJSON(w http.ResponseWriter, r *http.Request, code int, data any) {
-	resData, err := json.Marshal(data)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Ocurrió un error inesperado en el servidor"))
-		log.Printf("request to [%s] failed to marshal data: %v\n", r.URL.Path, err)
-		return
-	}
-
+	w.Header().Set("Connection", "close")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(resData)
+
+	err := json.NewEncoder(w).Encode(data)
+	if err != nil {
+		log.Printf("[%s] %s failed: %v\n", r.Method, r.URL.Path, err)
+		w.Write([]byte("{\"error\": \"Internal server error\"}"))
+	}
 }
 
 func respondWithError(w http.ResponseWriter, r *http.Request, code int, reason string, err error) {
