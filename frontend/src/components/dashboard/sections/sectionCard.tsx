@@ -54,7 +54,7 @@ export function SectionCard({ section }: { section: TSection }) {
         setIsEditing(false);
     };
 
-    const handleSave = (formData: any) => {
+    const handleSave = () => {
         setIsUpdating(true);
         // Simulate a brief loading state for better UX
         setTimeout(() => {

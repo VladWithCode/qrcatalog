@@ -214,14 +214,6 @@ export function SectionEditForm({ section, onSave, onCancel }: SectionEditFormPr
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <FormField
-                            control={form.control}
-                            name="id"
-                            render={() => (
-                                <Input type="hidden" name="id" value={section.id} />
-                            )}
-                        />
-
                         {/* Section Name */}
                         <FormField
                             control={form.control}

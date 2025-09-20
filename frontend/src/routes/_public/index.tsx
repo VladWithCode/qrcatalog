@@ -1,10 +1,71 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { publicSectionsQueryOptions, type TSectionParagraph } from "@/sections";
+
+// Component to render paragraph content with list parsing
+function ParagraphContent({ content }: { content: string }) {
+    const LIST_SEPARATOR = '<=>';
+
+    if (content.includes(LIST_SEPARATOR)) {
+        const items = content.split(LIST_SEPARATOR).filter(item => item.trim() !== '');
+        return (
+            <ul className="list-disc list-inside space-y-2">
+                {items.map((item, index) => (
+                    <li key={index} className="text-inherit">
+                        {item.trim()}
+                    </li>
+                ))}
+            </ul>
+        );
+    }
+
+    // Regular paragraph content with line breaks
+    return (
+        <p className="text-inherit whitespace-pre-line">
+            {content}
+        </p>
+    );
+}
+
+// Component to render section paragraphs
+function SectionParagraphs({ paragraphs }: { paragraphs: TSectionParagraph[] }) {
+    if (!paragraphs || paragraphs.length === 0) {
+        return null;
+    }
+
+    return (
+        <>
+            {paragraphs.map((paragraph, index) => (
+                <div key={paragraph.id || index} className="mb-4">
+                    <ParagraphContent content={paragraph.content} />
+                </div>
+            ))}
+        </>
+    );
+}
 
 export const Route = createFileRoute("/_public/")({
     component: Index,
+    loader: async ({ context }) => {
+        return context.queryClient.ensureQueryData(publicSectionsQueryOptions);
+    },
 });
 
 function Index() {
+    const sections = useSuspenseQuery(publicSectionsQueryOptions).data;
+
+    // Find sections by name for specific content areas
+    const heroSection = sections.find(s => s.name === 'Sección Cabecera' || s.name === 'inicio');
+    const aboutSection = sections.find(s => s.name === 'Sección Nosotros' || s.name === 'nosotros');
+    const servicesSection = sections.find(s => s.name === 'Sección Servicio' || s.name === 'servicios' || s.name === 'limpieza');
+    const offerSection = sections.find(s => s.name === 'Sección Oferta' || s.name === 'oferta' || s.name === 'nuestra-oferta');
+    const limpiezaAirbnbSection = sections.find(s => s.name === 'Sección Limpieza' || s.name === 'airbnb');
+    const fumigationSection = sections.find(s => s.name === 'Sección Fumigación' || s.name === 'fumigacion');
+    const laundrySection = sections.find(s => s.name === 'Sección Lavanderia' || s.name === 'lavanderia');
+    const missionSection = sections.find(s => s.name === 'Sección Misión' || s.name === 'mision');
+    const productsSection = sections.find(s => s.name === 'Sección Productos' || s.name === 'productos');
+    const coverageSection = sections.find(s => s.name === 'Sección Cobertura' || s.name === 'cobertura');
+    const visionSection = sections.find(s => s.name === 'Sección Visión' || s.name === 'vision');
     return (
         <>
             <section
@@ -29,15 +90,15 @@ function Index() {
                         data-view-animate="fadeIn"
                         data-view-animate-pos=">"
                     >
-                        Estrellas de la limpieza
+                        {heroSection?.title || "Estrellas de la limpieza"}
                     </h1>
-                    <p
+                    <div
                         className="text-current/80 md:text-2xl translate-y-20 opacity-0"
                         data-view-animate="fadeIn"
                         data-view-animate-pos="<+=0.2"
                     >
-                        El mejor servicio de limpieza en toda la República Mexicana.
-                    </p>
+                        <SectionParagraphs paragraphs={heroSection?.paragraphs || []} />
+                    </div>
 
                     <a
                         href="#contacto"
@@ -60,19 +121,15 @@ function Index() {
                         data-view-animate="fadeIn"
                         data-view-animate-pos=">"
                     >
-                        ¿Quiénes Somos?
+                        {aboutSection?.title || "¿Quiénes Somos?"}
                     </h2>
-                    <p
+                    <div
                         className="translate-y-20 opacity-0"
                         data-view-animate="fadeIn"
                         data-view-animate-pos="<+=0.2"
                     >
-                        Somos una empresa orgullosamente mexicana con presencia en distintos
-                        estados de la república, distinguida por el uso de equipo de última
-                        generación y personal altamente capacitado, obteniendo así la más alta
-                        calidad en los servicios ofertados a un precio justo, cuidando siempre
-                        tu economía.
-                    </p>
+                        <SectionParagraphs paragraphs={aboutSection?.paragraphs || []} />
+                    </div>
                 </div>
                 <div
                     className="w-full bg-stone-400 aspect-video rounded-sm opacity-0 overflow-hidden"
@@ -103,43 +160,11 @@ function Index() {
                         data-view-animate="fadeIn"
                         data-view-animate-pos=">"
                     >
-                        Nuestro Servicio
+                        {servicesSection?.title || "Nuestro Servicio"}
                     </h2>
-                    <p
-                        className="font-medium translate-y-20 opacity-0"
-                        data-view-animate="fadeIn"
-                        data-view-animate-pos="<+=0.2"
-                    >
-                        QR Estrellas de la Limpieza ofrece un servicio integral y profesional
-                        con presencia en diversas ciudades, abarcando un amplio territorio.
-                    </p>
-                    <p
-                        className="font-medium translate-y-20 opacity-0"
-                        data-view-animate="fadeIn"
-                        data-view-animate-pos="<+=0.2"
-                    >
-                        Contamos con documentación completa y actualizada, opciones flexibles de
-                        pago y facturación a medida para adaptarnos a tus necesidades.{" "}
-                    </p>
-                    <p
-                        className="font-medium translate-y-20 opacity-0"
-                        data-view-animate="fadeIn"
-                        data-view-animate-pos="<+=0.2"
-                    >
-                        Además, nuestra póliza de responsabilidad civil respalda la seguridad y
-                        confianza de nuestros clientes. Utilizamos maquinaria de alta gama y
-                        productos de calidad superior, elaborados cuidadosamente para garantizar
-                        resultados que no encontrarás en ningún otro lugar.
-                    </p>
-                    <p
-                        className="font-medium translate-y-20 opacity-0"
-                        data-view-animate="fadeIn"
-                        data-view-animate-pos="<+=0.2"
-                    >
-                        Disponibles las 24 horas del día, nos aseguramos de que tu espacio
-                        siempre esté impecable. Nuestro compromiso es brindar calidad,
-                        eficiencia y confianza, destacándonos como referentes en el sector.
-                    </p>
+                    <div className="space-y-4">
+                        <SectionParagraphs paragraphs={servicesSection?.paragraphs || []} />
+                    </div>
                 </div>
             </section>
 
@@ -162,18 +187,15 @@ function Index() {
                             data-view-animate="fadeIn"
                             data-view-animate-pos=">"
                         >
-                            Limpieza
-                            <span className="block text-secondary-dark">Airbnb</span>
+                            {limpiezaAirbnbSection?.title || (
+                                <>
+                                    Limpieza
+                                    <span className="block text-secondary-dark">Airbnb</span>
+                                </>
+                            )}
+
                         </h2>
-                        <p
-                            className="font-medium translate-y-20 opacity-0"
-                            data-view-animate="fadeIn"
-                            data-view-animate-pos="<+=0.2"
-                        >
-                            En QR Estrellas de la Limpieza, nos dedicamos a ofrecer un servicio
-                            de limpieza y desinfección de la más alta calidad para tu hogar,
-                            oficina o vehículo.
-                        </p>
+                        <SectionParagraphs paragraphs={limpiezaAirbnbSection?.paragraphs || []} />
                     </div>
                     <div
                         className="basis-1/2 shrink grow bg-stone-400 aspect-video rounded-sm overflow-hidden opacity-0"
@@ -281,44 +303,11 @@ function Index() {
                         data-view-animate="fadeIn"
                         data-view-animate-pos=">"
                     >
-                        Nuestra Oferta
+                        {offerSection?.title || "Nuestra Oferta"}
                     </h2>
-                    <p
-                        className="font-medium translate-y-20 opacity-0"
-                        data-view-animate="fadeIn"
-                        data-view-animate-pos="<+=0.2"
-                    >
-                        QR Estrellas de la Limpieza ofrece una amplia gama de servicios
-                        diseñados para cubrir todas las necesidades de nuestros clientes.
-                    </p>
-                    <p
-                        className="font-medium translate-y-20 opacity-0"
-                        data-view-animate="fadeIn"
-                        data-view-animate-pos="<+=0.2"
-                    >
-                        Desde autolavados y limpieza de casa habitación, hasta un servicio
-                        express profesional 24 horas para Airbnb, adaptándonos a cada
-                        requerimiento.
-                    </p>
-                    <p
-                        className="font-medium translate-y-20 opacity-0"
-                        data-view-animate="fadeIn"
-                        data-view-animate-pos="<+=0.2"
-                    >
-                        Además, contamos con lavanderías, venta de productos de limpieza de la
-                        más alta calidad, elaborados a mano, y servicio especializado de lavado
-                        de interiores de autobuses.
-                    </p>
-                    <p
-                        className="font-medium translate-y-20 opacity-0"
-                        data-view-animate="fadeIn"
-                        data-view-animate-pos="<+=0.2"
-                    >
-                        También ofrecemos fumigaciones y mantenimiento integral, todo con la
-                        garantía de un trabajo impecable y atención personalizada. Con presencia
-                        en varias ciudades y disponibilidad 24/7, estamos comprometidos con
-                        brindar soluciones completas, eficientes y de calidad.
-                    </p>
+                    <div className="space-y-4">
+                        <SectionParagraphs paragraphs={offerSection?.paragraphs || []} />
+                    </div>
                 </div>
             </section>
 
@@ -334,19 +323,15 @@ function Index() {
                             data-view-animate="fadeIn"
                             data-view-animate-pos=">"
                         >
-                            Servicio de
-                            <span className="text-secondary-dark">Fumigación</span>
+                            {fumigationSection?.title || "Servicio de Fumigación"}
                         </h2>
-                        <p
+                        <div
                             className="font-medium opacity-0 translate-y-20"
                             data-view-animate="fadeIn"
                             data-view-animate-pos="<+=0.2"
                         >
-                            Nuestra misión es erradicar cualquier tipo de plaga en los
-                            domicilios, talleres y unidades de transporte para con esto asegurar
-                            la seguridad y confianza de los pasajeros y empleados de los
-                            talleres y oficinas donde se brindará el servicio.
-                        </p>
+                            <SectionParagraphs paragraphs={fumigationSection?.paragraphs || []} />
+                        </div>
                     </div>
                     <div
                         className="basis-1/2 shrink grow bg-stone-400 aspect-video rounded-sm overflow-hidden opacity-0"
@@ -399,18 +384,15 @@ function Index() {
                             data-view-animate="fadeIn"
                             data-view-animate-pos=">"
                         >
-                            Servicio de
-                            <span className="block text-primary-dark">Lavanderia</span>
+                            {laundrySection?.title || "Servicio de Lavanderia"}
                         </h2>
-                        <p
+                        <div
                             className="font-medium opacity-0 translate-y-20"
                             data-view-animate="fadeIn"
                             data-view-animate-pos="<+=0.2"
                         >
-                            Tu ropa limpia, fresca y lista a tiempo. Servicio de lavado, secado
-                            y planchado con cuidado profesional. Entregamos con calidad y
-                            puntualidad.
-                        </p>
+                            <SectionParagraphs paragraphs={laundrySection?.paragraphs || []} />
+                        </div>
                     </div>
                     <div
                         className="basis-1/2 shrink grow bg-stone-400 aspect-video rounded-sm overflow-hidden opacity-0"
@@ -435,15 +417,9 @@ function Index() {
                         data-view-animate="fadeIn"
                         data-view-animate-pos=">"
                     >
-                        Nuestros Productos
+                        {productsSection?.title || "Productos"}
                     </h2>
-                    <p
-                        className="font-medium opacity-0 translate-y-20"
-                        data-view-animate="fadeIn"
-                        data-view-animate-pos="<+=0.2"
-                    >
-                        Productos profesionales personalizados para cada tipo de trabajo
-                    </p>
+                    <SectionParagraphs paragraphs={productsSection?.paragraphs || []} />
                 </div>
                 <div className="grid grid-cols-4 grid-rows-3 w-full aspect-[4/3] gap-2 select-none">
                     <button
@@ -555,16 +531,14 @@ function Index() {
                         data-view-animate="fadeIn"
                         data-view-animate-pos=">"
                     >
-                        Misión
+                        {missionSection?.title || "Misión"}
                     </h2>
-                    <p
+                    <div
                         className="font-medium opacity-0 translate-y-20"
                         data-view-animate="fadeIn"
                     >
-                        Generar un ambiente de bienestar mediante la conservación de áreas
-                        limpias y libres de plaga para asegurar la tranquilidad y salud de
-                        nuestros clientes a un precio justo.
-                    </p>
+                        <SectionParagraphs paragraphs={missionSection?.paragraphs || []} />
+                    </div>
                 </div>
             </section>
 
@@ -579,16 +553,9 @@ function Index() {
                         data-view-animate="fadeIn"
                         data-view-animate-pos=">"
                     >
-                        Cobertura
+                        {coverageSection?.title || "Cobertura"}
                     </h2>
-                    <p
-                        className="font-medium opacity-0 translate-y-20"
-                        data-view-animate="fadeIn"
-                        data-view-animate-pos="<+=0.2"
-                    >
-                        Operamos en multiples estados de México. Descubre si estamos en tu
-                        ciudad.
-                    </p>
+                    <SectionParagraphs paragraphs={coverageSection?.paragraphs.slice(0, 1) || []} />
                     <div className="relative bg-stone-400 aspect-[4/3] rounded-sm z-10 -mx-4 mt-4">
                         <img
                             src="/mapa_mex.webp"
@@ -596,27 +563,13 @@ function Index() {
                             className="w-full h-full object-cover"
                         />
                     </div>
-                    <p
-                        className="font-bold text-lg opacity-0 translate-y-20"
+                    <div
+                        className="font-medium opacity-0 translate-y-20"
                         data-view-animate="fadeIn"
                         data-view-animate-pos="<+=0.2"
                     >
-                        Contamos con sucursales en:
-                    </p>
-                    <ul
-                        className="font-medium opacity-0 translate-y-20"
-                        data-view-animate="fadeIn"
-                        data-view-animate-pos="<30%"
-                    >
-                        <li>Mazatlán, Sinaloa.</li>
-                        <li>Durango, Durango.</li>
-                        <li>Monterrey, Nuevo León.</li>
-                        <li>Guadalajara, Jalisco.</li>
-                        <li>México, CDMX.</li>
-                        <li>Chihuahua, Chihuahua.</li>
-                        <li>Tepic, Nayarit.</li>
-                        <li>Tijuana, Baja California.</li>
-                    </ul>
+                        <SectionParagraphs paragraphs={coverageSection?.paragraphs.slice(1) || []} />
+                    </div>
                 </div>
             </section>
 
@@ -637,16 +590,14 @@ function Index() {
                         data-view-animate="fadeIn"
                         data-view-animate-pos=">"
                     >
-                        Visión
+                        {visionSection?.title || "Visión"}
                     </h2>
-                    <p
+                    <div
                         className="font-medium opacity-0 translate-y-20"
                         data-view-animate="fadeIn"
                     >
-                        Posicionarnos como la empresa líder en el servicio profesional de
-                        limpieza y control de plagas a nivel nacional superando las expectativas
-                        de nuestros clientes más exigentes.
-                    </p>
+                        <SectionParagraphs paragraphs={visionSection?.paragraphs || []} />
+                    </div>
                 </div>
             </section>
         </>
