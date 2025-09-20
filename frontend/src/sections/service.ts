@@ -21,6 +21,7 @@ export type TSectionParagraph = {
     section_id: string;
     order: number;
     content: string;
+    content_as_list: boolean;
     created_at: string;
     updated_at: string;
 };

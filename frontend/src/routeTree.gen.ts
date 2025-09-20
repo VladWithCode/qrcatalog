@@ -14,6 +14,7 @@ import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedSeccionesEditarSectionIdRouteImport } from './routes/_authenticated/secciones/editar.$sectionId'
 
 const IniciarSesionRoute = IniciarSesionRouteImport.update({
   id: '/iniciar-sesion',
@@ -38,16 +39,24 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSeccionesEditarSectionIdRoute =
+  AuthenticatedSeccionesEditarSectionIdRouteImport.update({
+    id: '/secciones/editar/$sectionId',
+    path: '/secciones/editar/$sectionId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/iniciar-sesion': typeof IniciarSesionRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/': typeof PublicIndexRoute
+  '/secciones/editar/$sectionId': typeof AuthenticatedSeccionesEditarSectionIdRoute
 }
 export interface FileRoutesByTo {
   '/iniciar-sesion': typeof IniciarSesionRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/': typeof PublicIndexRoute
+  '/secciones/editar/$sectionId': typeof AuthenticatedSeccionesEditarSectionIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -56,12 +65,17 @@ export interface FileRoutesById {
   '/iniciar-sesion': typeof IniciarSesionRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_public/': typeof PublicIndexRoute
+  '/_authenticated/secciones/editar/$sectionId': typeof AuthenticatedSeccionesEditarSectionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/iniciar-sesion' | '/dashboard' | '/'
+  fullPaths:
+    | '/iniciar-sesion'
+    | '/dashboard'
+    | '/'
+    | '/secciones/editar/$sectionId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/iniciar-sesion' | '/dashboard' | '/'
+  to: '/iniciar-sesion' | '/dashboard' | '/' | '/secciones/editar/$sectionId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -69,6 +83,7 @@ export interface FileRouteTypes {
     | '/iniciar-sesion'
     | '/_authenticated/dashboard'
     | '/_public/'
+    | '/_authenticated/secciones/editar/$sectionId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -114,15 +129,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/secciones/editar/$sectionId': {
+      id: '/_authenticated/secciones/editar/$sectionId'
+      path: '/secciones/editar/$sectionId'
+      fullPath: '/secciones/editar/$sectionId'
+      preLoaderRoute: typeof AuthenticatedSeccionesEditarSectionIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSeccionesEditarSectionIdRoute: typeof AuthenticatedSeccionesEditarSectionIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSeccionesEditarSectionIdRoute:
+    AuthenticatedSeccionesEditarSectionIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

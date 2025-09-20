@@ -168,6 +168,8 @@
     --color-accent: #f05988;
     --color-accent-light: #f16780;
     --color-warning: #f48665;
+    --color-destructive: #f05988;
+
 
     --c-bg-header-opaque: --alpha(var(--color-gray-50) / 100%);
     --c-bg-header-translucent: --alpha(var(--color-gray-50) / 0%);
