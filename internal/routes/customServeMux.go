@@ -33,14 +33,14 @@ func (csm *customServeMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	handler, pattern := csm.Handler(r)
+	_, pattern := csm.Handler(r)
 
 	if pattern == "" {
 		csm.notFoundHandle(w, r)
 		return
 	}
 
-	handler.ServeHTTP(w, r)
+	csm.ServeMux.ServeHTTP(w, r)
 }
 
 // Set the custom NotFoundHandler

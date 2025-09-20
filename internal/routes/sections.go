@@ -93,6 +93,12 @@ func CreateSection(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateSection(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	if id == "" {
+		respondWithError(w, r, http.StatusBadRequest, "El ID de la sección es requerido", nil)
+		return
+	}
+
 	var data db.Section
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
@@ -101,7 +107,6 @@ func UpdateSection(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data.ID = r.PathValue("id")
-	fmt.Printf("data: %v\n", data)
 	err = db.UpdateSectionWithAdditions(r.Context(), &data)
 	if err != nil {
 		if strings.Contains(err.Error(), "23505") {
