@@ -19,7 +19,7 @@ export function ParagraphContent({ content }: { content: string }) {
 
     // Regular paragraph content with line breaks
     return (
-        <p className="text-inherit whitespace-pre-line">
+        <p className="text-inherit whitespace-pre-line translate-y-12 opacity-0" data-view-animate>
             {content}
         </p>
     );
