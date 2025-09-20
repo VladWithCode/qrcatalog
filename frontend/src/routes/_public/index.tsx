@@ -1,49 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { publicSectionsQueryOptions, type TSectionParagraph } from "@/sections";
+import { publicSectionsQueryOptions, type TSection } from "@/sections";
 import { AirbnbSection } from "@/components/dashboard/sections/airbnb-section";
-
-// Component to render paragraph content with list parsing
-function ParagraphContent({ content }: { content: string }) {
-    const LIST_SEPARATOR = '<=>';
-
-    if (content.includes(LIST_SEPARATOR)) {
-        const items = content.split(LIST_SEPARATOR).filter(item => item.trim() !== '');
-        return (
-            <ul className="list-disc list-inside space-y-2">
-                {items.map((item, index) => (
-                    <li key={index} className="text-inherit">
-                        {item.trim()}
-                    </li>
-                ))}
-            </ul>
-        );
-    }
-
-    // Regular paragraph content with line breaks
-    return (
-        <p className="text-inherit whitespace-pre-line">
-            {content}
-        </p>
-    );
-}
-
-// Component to render section paragraphs
-function SectionParagraphs({ paragraphs }: { paragraphs: TSectionParagraph[] }) {
-    if (!paragraphs || paragraphs.length === 0) {
-        return null;
-    }
-
-    return (
-        <>
-            {paragraphs.map((paragraph, index) => (
-                <div key={paragraph.id || index} className="mb-4">
-                    <ParagraphContent content={paragraph.content} />
-                </div>
-            ))}
-        </>
-    );
-}
+import { SectionParagraphs } from "@/components/sections";
 
 export const Route = createFileRoute("/_public/")({
     component: Index,
@@ -56,10 +15,10 @@ function Index() {
     const sections = useSuspenseQuery(publicSectionsQueryOptions).data;
 
     // Find sections by name for specific content areas
-    const heroSection = sections.find(s => s.name === 'Sección Cabecera' || s.name === 'inicio');
+    const heroSection = sections.find(s => s.name === 'Sección Cabecera' || s.name === 'cabecera');
     const aboutSection = sections.find(s => s.name === 'Sección Nosotros' || s.name === 'nosotros');
-    const servicesSection = sections.find(s => s.name === 'Sección Servicio' || s.name === 'servicios' || s.name === 'limpieza');
-    const offerSection = sections.find(s => s.name === 'Sección Oferta' || s.name === 'oferta' || s.name === 'nuestra-oferta');
+    const servicesSection = sections.find(s => s.name === 'Sección Servicio' || s.name === 'servicio');
+    const offerSection = sections.find(s => s.name === 'Sección Oferta' || s.name === 'oferta');
     const limpiezaAirbnbSection = sections.find(s => s.name === 'Sección Limpieza' || s.name === 'airbnb');
     const fumigationSection = sections.find(s => s.name === 'Sección Fumigación' || s.name === 'fumigacion');
     const laundrySection = sections.find(s => s.name === 'Sección Lavanderia' || s.name === 'lavanderia');
@@ -169,7 +128,7 @@ function Index() {
                 </div>
             </section>
 
-            <AirbnbSection />
+            <AirbnbSection section={limpiezaAirbnbSection as TSection} />
 
             <section className="relative z-0 pt-32 pb-16 -mt-24 px-4">
                 <div className="absolute inset-0 z-0">

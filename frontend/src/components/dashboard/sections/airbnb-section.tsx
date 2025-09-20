@@ -6,8 +6,10 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import type { TSection } from '@/sections';
+import { SectionParagraphs } from '@/components/sections';
 
-export function AirbnbSection() {
+export function AirbnbSection({ section }: { section: TSection }) {
     const [serviceDetailsOpen, setServiceDetailsOpen] = useState(false);
     const [extraServicesOpen, setExtraServicesOpen] = useState(false);
 
@@ -32,18 +34,18 @@ export function AirbnbSection() {
                             data-view-animate="fadeIn"
                             data-view-animate-pos=">"
                         >
-                            Limpieza
-                            <span className="block text-secondary-dark">Airbnb</span>
+                            {
+                                section?.title
+                                    ? section.title
+                                    : (
+                                        <>
+                                            Limpieza
+                                            <span className="block text-secondary-dark">Airbnb</span>
+                                        </>
+                                    )
+                            }
                         </h2>
-                        <p
-                            className="font-medium translate-y-20 opacity-0"
-                            data-view-animate="fadeIn"
-                            data-view-animate-pos="<+=0.2"
-                        >
-                            En QR Estrellas de la Limpieza, nos dedicamos a ofrecer un servicio
-                            de limpieza y desinfección de la más alta calidad para tu hogar,
-                            oficina o vehículo.
-                        </p>
+                        <SectionParagraphs paragraphs={section?.paragraphs || []} />
                     </div>
                     <div
                         className="basis-1/2 shrink grow bg-stone-400 aspect-video rounded-sm overflow-hidden opacity-0"
